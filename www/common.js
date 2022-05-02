@@ -115,7 +115,8 @@ ln.APP = {
     CABIFY: "cabify",
     BAIDU: "baidu",
     TAXIS_99: "taxis_99",
-    GAODE: "gaode"
+    GAODE: "gaode",
+    WEBFLEET: "webfleet"
 };
 
 /**
@@ -138,7 +139,8 @@ ln.APPS_BY_PLATFORM[ln.PLATFORM.ANDROID] = [
     ln.APP.CABIFY,
     ln.APP.BAIDU,
     ln.APP.TAXIS_99,
-    ln.APP.GAODE
+    ln.APP.GAODE,
+    ln.APP.WEBFLEET
 ];
 ln.APPS_BY_PLATFORM[ln.PLATFORM.IOS] = [
     ln.APP.USER_SELECT,
@@ -199,6 +201,7 @@ ln.APP_NAMES[ln.APP.CABIFY] = "Cabify";
 ln.APP_NAMES[ln.APP.BAIDU] = "Baidu Maps";
 ln.APP_NAMES[ln.APP.TAXIS_99] = "99 Taxi";
 ln.APP_NAMES[ln.APP.GAODE] = "Gaode Maps (Amap)";
+ln.APP_NAMES[ln.APP.WEBFLEET] = "Webfleet";
 
 /**
  * All possible transport modes
@@ -247,6 +250,12 @@ ln.TRANSPORT_MODES[ln.PLATFORM.ANDROID][ln.APP.BAIDU] = [
     ln.TRANSPORT_MODE.TRANSIT
 ];
 ln.TRANSPORT_MODES[ln.PLATFORM.ANDROID][ln.APP.GAODE] = [
+    ln.TRANSPORT_MODE.DRIVING,
+    ln.TRANSPORT_MODE.WALKING,
+    ln.TRANSPORT_MODE.BICYCLING,
+    ln.TRANSPORT_MODE.TRANSIT
+];
+ln.TRANSPORT_MODES[ln.PLATFORM.ANDROID][ln.APP.WEBFLEET] = [
     ln.TRANSPORT_MODE.DRIVING,
     ln.TRANSPORT_MODE.WALKING,
     ln.TRANSPORT_MODE.BICYCLING,

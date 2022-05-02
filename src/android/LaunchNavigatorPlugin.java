@@ -141,6 +141,11 @@ public class LaunchNavigatorPlugin extends CordovaPlugin {
         return true;
     }
 
+    @Override
+    void onDestroy() {
+        launchNavigator.onDestroy();
+    }
+
 
     /*
      * Utilities
