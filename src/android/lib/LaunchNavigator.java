@@ -135,8 +135,6 @@ public class LaunchNavigator {
     Context context;
     OkHttpClient httpClient = new OkHttpClient();
     ILogger logger;
-    NavAppClient mWebfleetNavappClient = null;
-    TripManager mWebfleetTripManager = null;
 
     // Map of app name to package name
     Map<String, String> availableApps;
@@ -155,16 +153,20 @@ public class LaunchNavigator {
     };
 
     String googleApiKey = null;
+
+    NavAppClient mWebfleetNavappClient;
+    TripManager mWebfleetTripManager;
     private final ErrorCallback mWebfleetErrorCallback = new ErrorCallback() {
         @Override
         public void onError(final NavAppError error) {
-            Log.e(TAG, "onError(" + error.getErrorMessage() + ")\n" + error.getStackTraceString());
+            logger.error("onError(" + error.getErrorMessage() + ")\n" + error.getStackTraceString());
             mWebfleetNavappClient = null;
         }
     };
-    private Trip.PlanListener mWebfleetPlanListener = new Trip.PlanListener() {
-        public void onTripPlanResult(final PlanResult result) {
-            Log.d(TAG, "onTripPlanResult result[" + result + "]");
+    private PlanListener mWebfleetPlanListener = new PlanListener() {
+        @Override
+        public void onTripPlanResult(Trip trip, final PlanResult result) {
+            logger.debug("onTripPlanResult result[" + result + "]");
         }
     };
 
