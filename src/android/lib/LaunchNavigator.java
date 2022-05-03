@@ -186,7 +186,11 @@ public class LaunchNavigator {
         initialize(context);
     }
 
-    public onDestroy() {
+    /*******************
+     * Destructor
+     *******************/
+
+    public void onDestroy() {
         if (mWebfleetNavappClient != null) {
             mWebfleetNavappClient.close();
             mWebfleetNavappClient = null;
@@ -1616,7 +1620,7 @@ public class LaunchNavigator {
                 mWebfleetTripManager = mWebfleetNavappClient.getTripManager();
             }
             String[] pos = splitLatLon(destLatLon);
-            Routeable destination = mWebfleetNavappClient.makeRouteable(pos[0], pos[1]);
+            Routeable destination = mWebfleetNavappClient.makeRouteable(Double.parseDouble(pos[0]), Double.parseDouble(pos[1]));
             mWebfleetTripManager.planTrip(destination, mWebfleetPlanListener);
 
             return null;
