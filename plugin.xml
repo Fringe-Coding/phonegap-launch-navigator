@@ -54,7 +54,7 @@
     <source-file src="src/android/lib/ILogger.java" target-dir="src/uk/co/workingedge" />
 
     <!-- WebFleet jar -->
-    <lib-file src="src/android/lib/maplibsdk.jar"/>
+    <source-file src="src/android/lib/navappclient.jar" target-dir="libs" />
 
     <config-file target="AndroidManifest.xml" parent="/*">
       <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />

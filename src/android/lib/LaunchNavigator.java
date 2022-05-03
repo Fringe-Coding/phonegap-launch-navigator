@@ -52,7 +52,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-
+import com.tomtom.navapp.*;
+import com.tomtom.navapp.Trip.*;
 public class LaunchNavigator {
     /**********************
      * Public properties

@@ -142,7 +142,7 @@ public class LaunchNavigatorPlugin extends CordovaPlugin {
     }
 
     @Override
-    void onDestroy() {
+    public void onDestroy() {
         launchNavigator.onDestroy();
     }
 
