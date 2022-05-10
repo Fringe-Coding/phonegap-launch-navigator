@@ -1613,6 +1613,7 @@ public class LaunchNavigator {
                 throw new Exception("Webfleet failed to read the co-ordinates");
             }
             logger.debug("Using Webfleet to navigate to ["+destLatLon+"] from current location");
+            
             // NAVIGATE
             if (mWebfleetNavappClient == null) {
                 // Instantiate the NavAppClient passing in a Context.
@@ -1622,6 +1623,13 @@ public class LaunchNavigator {
             String[] pos = splitLatLon(destLatLon);
             Routeable destination = mWebfleetNavappClient.makeRouteable(Double.parseDouble(pos[0]), Double.parseDouble(pos[1]));
             mWebfleetTripManager.planTrip(destination, mWebfleetPlanListener);
+
+            // Open webfleet
+            if (supportedAppPackages.containsKey(WEBFLEET)) {
+                String packageName = supportedAppPackages.get(WEBFLEET);
+                Intent intent = context.getPackageManager().getLaunchIntentForPackage(packageName);
+                context.startActivity(intent);
+            }
 
             return null;
         }catch( JSONException e ) {
