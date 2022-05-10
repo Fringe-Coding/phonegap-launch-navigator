@@ -52,7 +52,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-
+import com.tomtom.navapp.*;
+import com.tomtom.navapp.Trip.*;
 public class LaunchNavigator {
     /**********************
      * Public properties
@@ -78,6 +79,7 @@ public class LaunchNavigator {
     public final String BAIDU = "baidu";
     public final String TAXIS_99 = "taxis_99";
     public final String GAODE = "gaode";
+    public final String WEBFLEET = "webfleet";
 
 
     public final Map<String, String> supportedAppPackages;
@@ -97,6 +99,7 @@ public class LaunchNavigator {
         _supportedAppPackages.put(BAIDU, "com.baidu.BaiduMap");
         _supportedAppPackages.put(TAXIS_99, "com.taxis99");
         _supportedAppPackages.put(GAODE, "com.autonavi.minimap");
+        _supportedAppPackages.put(WEBFLEET, "com.tomtom.navpad.navapp");
         supportedAppPackages = Collections.unmodifiableMap(_supportedAppPackages);
     }
 
@@ -117,6 +120,7 @@ public class LaunchNavigator {
         _supportedAppNames.put(BAIDU, "Baidu Maps");
         _supportedAppNames.put(TAXIS_99, "99 Taxi");
         _supportedAppNames.put(GAODE, "Gaode Maps (Amap)");
+        _supportedAppNames.put(WEBFLEET, "WebFleet");
         supportedAppNames = Collections.unmodifiableMap(_supportedAppNames);
     }
 
@@ -131,7 +135,6 @@ public class LaunchNavigator {
     Context context;
     OkHttpClient httpClient = new OkHttpClient();
     ILogger logger;
-
 
     // Map of app name to package name
     Map<String, String> availableApps;
@@ -151,6 +154,22 @@ public class LaunchNavigator {
 
     String googleApiKey = null;
 
+    NavAppClient mWebfleetNavappClient;
+    TripManager mWebfleetTripManager;
+    private final ErrorCallback mWebfleetErrorCallback = new ErrorCallback() {
+        @Override
+        public void onError(final NavAppError error) {
+            logger.error("onError(" + error.getErrorMessage() + ")\n" + error.getStackTraceString());
+            mWebfleetNavappClient = null;
+        }
+    };
+    private PlanListener mWebfleetPlanListener = new PlanListener() {
+        @Override
+        public void onTripPlanResult(Trip trip, final PlanResult result) {
+            logger.debug("onTripPlanResult result[" + result + "]");
+        }
+    };
+
 
     /*******************
      * Constructors
@@ -165,6 +184,18 @@ public class LaunchNavigator {
         this.geocodingEnabled = geocodingEnabled;
         setLogger(logger);
         initialize(context);
+    }
+
+    /*******************
+     * Destructor
+     *******************/
+
+    public void onDestroy() {
+        if (mWebfleetNavappClient != null) {
+            mWebfleetNavappClient.close();
+            mWebfleetNavappClient = null;
+            mWebfleetTripManager = null;
+        }
     }
 
 
@@ -278,6 +309,8 @@ public class LaunchNavigator {
             error = launchGaode(params);
         }else if(appName.equals(TAXIS_99)){
             error = launch99Taxis(params);
+        }else if(appName.equals(WEBFLEET)){
+            error = launchWebfleet(params);
         }else{
             error = launchApp(params);
         }
@@ -1563,6 +1596,50 @@ public class LaunchNavigator {
             }
             return msg;
         }
+    }
+
+    private String launchWebfleet(JSONObject params) throws Exception{
+        try {
+            String destLatLon = null;
+            String dType = params.getString("dType");
+
+            if(dType.equals("name")){
+                throw new Exception("Webfleet can only navigate with latitude and longitude");
+            }else{
+                destLatLon = getLocationFromPos(params, "dest");
+            }
+
+            if(isNull(destLatLon)){
+                throw new Exception("Webfleet failed to read the co-ordinates");
+            }
+            logger.debug("Using Webfleet to navigate to ["+destLatLon+"] from current location");
+            
+            // NAVIGATE
+            if (mWebfleetNavappClient == null) {
+                // Instantiate the NavAppClient passing in a Context.
+                mWebfleetNavappClient = NavAppClient.Factory.make(this.context, mWebfleetErrorCallback);
+                mWebfleetTripManager = mWebfleetNavappClient.getTripManager();
+            }
+            String[] pos = splitLatLon(destLatLon);
+            Routeable destination = mWebfleetNavappClient.makeRouteable(Double.parseDouble(pos[0]), Double.parseDouble(pos[1]));
+            mWebfleetTripManager.planTrip(destination, mWebfleetPlanListener);
+
+            // Open webfleet
+            if (supportedAppPackages.containsKey(WEBFLEET)) {
+                String packageName = supportedAppPackages.get(WEBFLEET);
+                Intent intent = context.getPackageManager().getLaunchIntentForPackage(packageName);
+                context.startActivity(intent);
+            }
+
+            return null;
+        }catch( JSONException e ) {
+            String msg = e.getMessage();
+            if(msg.contains(NO_APP_FOUND)){
+                msg = "Webfleet app is not installed on this device";
+            }
+            return msg;
+        }
+
     }
 
     /*
